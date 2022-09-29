@@ -9,10 +9,20 @@ class Maps(View):
         location = to_cordinates(
             sanitize(self.request.query.get('location', None))
         )
-        print(location, type(location))
 
         # create map using location
         map = folium.Map(location=location, zoom_start=15)
 
+        # add markers
+        folium.Marker(
+            location=location,
+            popup='location',
+            tooltip=str(location)
+        ).add_to(map)
+        folium.CircleMarker(
+            location=location,
+            radius=10
+        ).add_to(map)
+
         # return map in html format
-        return  Response(text=map._repr_html_(), content_type='text/html', status=200)
+        return Response(text=map._repr_html_(), content_type='text/html', status=200)
