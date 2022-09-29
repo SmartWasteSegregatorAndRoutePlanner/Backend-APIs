@@ -1,3 +1,4 @@
 aiodns
 aiohttp
+aiohttp-swagger[performance]
 folium
