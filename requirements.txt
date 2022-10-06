@@ -1,4 +1,6 @@
 aiodns
 aiohttp
+aiohttp-devtools
+aiohttp-ratelimiter
 aiohttp-swagger[performance]
 folium

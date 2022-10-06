@@ -27,3 +27,11 @@ This repo contains backend APIs for Smart Waste Segregator and Route Planner
   ```bash
   python main.py
   ```
+
+## Run During Development
+
+- Start project with devtools
+
+  ```bash
+  adev runserver .
+  ```

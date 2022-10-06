@@ -1,8 +1,8 @@
-from ensurepip import version
 from aiohttp import web
 from aiohttp_swagger import setup_swagger
-from views import Maps
 from utils import create_json_response
+from views import Maps
+
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -14,6 +14,9 @@ async def home(request):
 
 # create web application
 app = web.Application()
+
+# configure web app
+
 
 # routes
 app.router.add_get('/', home)

@@ -1,9 +1,12 @@
 from aiohttp.web import View, Response
 from utils import sanitize, to_cordinates
+# from rate_limiter import limiter
+
 import folium
 
 
 class Maps(View):
+    # @limiter.limit("1/min")
     async def get(self):
         '''
         ---
