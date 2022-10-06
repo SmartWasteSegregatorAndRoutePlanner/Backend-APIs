@@ -3,11 +3,17 @@ from aiohttp.web import Response
 
 
 def create_json_response(data: dict, status_code: int = 200):
+    '''
+    creates json response for web application based on passed params
+    '''
     assert isinstance(status_code, int)
     return Response(text=json.dumps(data), content_type='application/json', status=status_code)
 
 
 def to_cordinates(location: str, default: tuple[float] = (28.653458, 77.123767)):
+    '''
+    converts string obj to floating co-ordinate numbers
+    '''
     assert isinstance(location, str)
 
     co_ords = default
@@ -21,6 +27,9 @@ def to_cordinates(location: str, default: tuple[float] = (28.653458, 77.123767))
 
 
 async def get_json_data(request):
+    '''
+    extracts json data from requests
+    '''
     try:
         if request.headers.get('Content-Type', None):
             data = await request.json()
@@ -33,4 +42,7 @@ async def get_json_data(request):
 
 
 def sanitize(data: str) -> str:
+    '''
+    replaces html content
+    '''
     return str(data).replace('\"', '&quot;').replace('\'', '&#39;').replace('<', '&lt;').replace('>', '&gt;')
