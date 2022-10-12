@@ -4,3 +4,5 @@ aiohttp-devtools
 aiohttp-ratelimiter
 aiohttp-swagger[performance]
 folium
+osmnx
+pyrosm
