@@ -11,6 +11,6 @@ commit_message=$1
 
 git add .
 git commit -S -am "${commit_message}"
-git push heroku master
+git push heroku main
 
 echo -e "[*] Don't forget to add repo to heroku using: heroku git:remote -a <app-name>"

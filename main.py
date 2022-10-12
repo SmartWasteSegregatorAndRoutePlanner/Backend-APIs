@@ -1,8 +1,8 @@
-from ensurepip import version
 from aiohttp import web
 from aiohttp_swagger import setup_swagger
-from views import Maps
+from os import environ
 from utils import create_json_response
+from views import Maps
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -37,5 +37,5 @@ if __name__ == '__main__':
     web.run_app(
         app=app,
         host='0.0.0.0',
-        port=8080,
+        port=environ.get('PORT', 8080),
     )
