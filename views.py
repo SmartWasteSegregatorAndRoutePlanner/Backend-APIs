@@ -1,12 +1,12 @@
 from aiohttp.web import View, Response
 from utils import sanitize, to_cordinates, get_json_data, create_json_response, to_sorted_locations_list
-# from rate_limiter import limiter
+from rate_limiter import limiter
 
 import folium
 
 
 class Maps(View):
-    # @limiter.limit("10/sec")
+    @limiter.limit(ratelimit="1/second")
     async def get(self):
         '''
         ---
@@ -28,10 +28,12 @@ class Maps(View):
                 description: successful operation. Returns html page with map
             "405":
                 description: Method Not allowed
+            "429":
+                description: Rate limit exceeded
         '''
         # get location from request url
         location = to_cordinates(
-            sanitize(self.request.query.get('location', None))
+            sanitize(self.query.get('location', None))
         )
 
         # create map using location
@@ -51,7 +53,7 @@ class Maps(View):
         # return map in html format
         return Response(text=map._repr_html_(), content_type='text/html', status=200)
 
-    # @limiter.limit("10/sec")
+    @limiter.limit(ratelimit="1/second")
     async def post(self):
         '''
         ---

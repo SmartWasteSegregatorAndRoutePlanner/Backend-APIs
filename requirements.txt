@@ -1,8 +1,14 @@
 aiodns
 aiohttp
 aiohttp-devtools
-aiohttp-ratelimiter
+aiohttp-ratelimiter>=4.0.0
 aiohttp-swagger[performance]
+# for optimal route
 folium
 osmnx
-pyrosm
+numpy
+networkx
+igraph
+geopandas
+pandas
+pyrosm # requires cykhash

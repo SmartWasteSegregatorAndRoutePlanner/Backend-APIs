@@ -28,6 +28,23 @@ This repo contains backend APIs for Smart Waste Segregator and Route Planner
   python main.py
   ```
 
+## Installation Error Cases for Windows
+
+- Check python installed arch version using
+
+  ```python
+  import struct
+  print(struct.calcsize("P") * 8)
+  ```
+
+- [Fiona](https://www.lfd.uci.edu/~gohlke/pythonlibs/#fiona) and [GDAL](https://www.lfd.uci.edu/~gohlke/pythonlibs/#gdal) needs to be installed manually using pre-complied wheel package
+
+  ```bash
+  python -m pip install <path-to-wheel-file>
+  ```
+
+  > Note: Check python version 3.x and cpu arch then download wheel file accordingly
+
 ## Run During Development
 
 - Start project with devtools
@@ -35,3 +52,9 @@ This repo contains backend APIs for Smart Waste Segregator and Route Planner
   ```bash
   adev runserver .
   ```
+
+## Running with Normal Configuration
+
+```bash
+python main.py
+```
