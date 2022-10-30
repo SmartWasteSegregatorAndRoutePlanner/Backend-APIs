@@ -13,7 +13,7 @@ ox.settings.use_cache = True
 
 class Maps(View):
     @limiter.limit(ratelimit="1/second")
-    async def get(self):
+    async def get(request):
         '''
         ---
         description: This endpoint allows user to load maps marking specified location
@@ -39,7 +39,7 @@ class Maps(View):
         '''
         # get location from request url
         location = to_cordinates(
-            sanitize(self.query.get('location', None))
+            sanitize(request.query.get('location', None))
         )
 
         # create map using location
@@ -105,9 +105,7 @@ class Maps(View):
                 'msg': 'locations data required in [ [lat1, long1, node_weight1], [lat2, long2, node_weight2] ] format'}
             status_code = 400
             if status:
-                # resp = sorted(locations, key=lambda location: location[2])
-                # status_code = 200
-
+                print(locations)
                 # TODO: write logic for finding shortest distance
 
                 # define the start and end locations in latlng
