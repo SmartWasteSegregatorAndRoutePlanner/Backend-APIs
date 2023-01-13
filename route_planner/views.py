@@ -52,10 +52,15 @@ class MapView(APIView):
         map = Map(location=locations[0], zoom_start=15)
             
         # get route co-ords
-        geojson_data = get_geojson_route_cordinates(cordinates=locations)
+        geojson_data, status_code = get_geojson_route_cordinates(cordinates=locations)
 
+        if status_code != 200:
+            err = geojson_data
+            return Response({'err':err})
+            
         # plot data on map
         plot_geojson_data_on_map(geojson=geojson_data, map=map)
+
 
         # # add markers
         # Marker(
