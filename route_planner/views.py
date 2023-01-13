@@ -4,11 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.parsers import JSONParser
-from .utils import sanitize, to_cordinates
-
-import osmnx as ox
-import networkx as nx
-
+from .utils import sanitize, to_cordinates, get_geojson_route_cordinates, plot_geojson_data_on_map
 
 
 # /api/route-mapper/map
@@ -41,64 +37,41 @@ class MapView(APIView):
 
     def post(self, request:Request):
         json_data = request.data
+        print(json_data)
         locations = json_data.get('locations', [[]])
-        return Response({
-            'locations':locations
-        })
+        print(locations)
 
         # extract locations and sort according to their weights
-        locations, status = to_sorted_locations_list(
-            json_data.get('locations', [[]])
-        )
 
         resp = {
-            'msg': 'locations data required in [ [lat1, long1, node_weight1], [lat2, long2, node_weight2] ] format'}
+            'msg': 'locations data required in [ [lat1, long1], [lat2, long2,], ... ] format'
+        }
         status_code = 400
-        if status:
-            print(locations)
-            # TODO: write logic for finding shortest distance
 
-            # define the start and end locations in latlng
-            start_latlng = (37.78497, -122.43327)
-            end_latlng = (37.78071, -122.41445)
-            mode = 'drive' # 'drive', 'bike', 'walk'# find shortest path based on distance or time
-            optimizer = 'length'# 'length','time'
+        # create Map
+        map = Map(location=locations[0], zoom_start=15)
+            
+        # get route co-ords
+        geojson_data = get_geojson_route_cordinates(cordinates=locations)
 
-            graph = ox.graph_from_point(
-                center_point=start_latlng, dist=4000, network_type=mode)
+        # plot data on map
+        plot_geojson_data_on_map(geojson=geojson_data, map=map)
 
-            # find the nearest node to the end location
-            orig_nodes = ox.nearest_nodes(
-                graph, X=start_latlng[1], Y=start_latlng[0])
-            dest_nodes = ox.nearest_nodes(
-                graph, X=end_latlng[1], Y=end_latlng[0] )  # find the shortest path
+        # # add markers
+        # Marker(
+        #     location=start_latlng,
+        #     tooltip='Start Location',
+        #     popup=str(start_latlng)
+        # ).add_to(shortest_route_map)
 
-            shortest_route = nx.shortest_path(
-                graph,
-                orig_nodes,
-                dest_nodes,
-                weight=optimizer
-            )
+        # Marker(
+        #     location=end_latlng,
+        #     tooltip='End Location',
+        #     popup=str(end_latlng)
+        # ).add_to(shortest_route_map)
 
-            # create map for shortest distance
-            shortest_route_map = ox.plot_route_folium(graph, shortest_route, tiles='openstreetmap')
-
-            # add markers
-            Marker(
-                location=start_latlng,
-                tooltip='Start Location',
-                popup=str(start_latlng)
-            ).add_to(shortest_route_map)
-
-            Marker(
-                location=end_latlng,
-                tooltip='End Location',
-                popup=str(end_latlng)
-            ).add_to(shortest_route_map)
-
-            # add markers to starting and ending location
-            return Response(text=shortest_route_map._repr_html_(), content_type='text/html', status=200)
+        # return map in html format
+        return HttpResponse(map._repr_html_())
 
 
-            status_code = 200
 

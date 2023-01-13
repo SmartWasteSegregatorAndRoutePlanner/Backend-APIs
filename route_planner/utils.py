@@ -1,6 +1,7 @@
 from backend_api.settings import ORS_API_KEY
 from folium import GeoJson, Map
 from openrouteservice import Client
+from openrouteservice.exception
 from openrouteservice.convert import decode_polyline
 
 def to_cordinates(location: str, default: tuple[float] = (28.653458, 77.123767)):
