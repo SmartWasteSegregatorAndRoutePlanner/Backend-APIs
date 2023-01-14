@@ -1,5 +1,5 @@
 from backend_api.settings import ORS_API_KEY
-from folium import GeoJson, Map
+from folium import GeoJson, Map, Marker
 from openrouteservice import Client
 from openrouteservice.exceptions import ApiError
 from openrouteservice.convert import decode_polyline
@@ -60,8 +60,15 @@ def get_geojson_route_cordinates(cordinates: list[list[float]]):
     return geojson_data, status
 
 
-def add_markers(co_ordinates: list[list[float]], map: Map):
-    pass
+def add_markers_to_map(co_ordinates: list[list[float]], map: Map):
+    for coordinate in co_ordinates:
+        Marker(
+            location=coordinate,
+            # tooltip='',
+            popup=str(coordinate)
+        ).add_to(map)
+
+    return map
 
 
 def sanitize(data: str) -> str:
