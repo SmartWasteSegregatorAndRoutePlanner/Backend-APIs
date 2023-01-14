@@ -64,7 +64,6 @@ class MapView(APIView):
 
         # add markers
         add_markers_to_map(co_ordinates=locations, map=map)
-        print(map.to_json())
 
         # return map in html format
         return HttpResponse(map._repr_html_())
