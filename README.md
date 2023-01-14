@@ -2,6 +2,10 @@
 
 This repo contains backend APIs for Smart Waste Segregator and Route Planner
 
+### Latest Build Status
+
+![Heroku Deployment WorkFlow](https://github.com/SmartWasteSegregatorAndRoutePlanner/Backend-APIs/actions/workflows/main.yml/badge.svg)
+
 ## Installation
 
 - clone/download this repo
@@ -58,3 +62,4 @@ This repo contains backend APIs for Smart Waste Segregator and Route Planner
 ```bash
 python main.py
 ```
+
