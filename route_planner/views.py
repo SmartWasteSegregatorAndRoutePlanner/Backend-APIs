@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.parsers import JSONParser
-from .utils import sanitize, to_cordinates, get_geojson_route_cordinates, plot_geojson_data_on_map, add_markers_to_map
+from .utils import sanitize, to_cordinates, get_route_data, plot_geojson_data_on_map, add_markers_to_map
 
 
 # /api/route-mapper/map
@@ -37,36 +37,32 @@ class MapView(APIView):
 
     def post(self, request:Request):
         json_data = request.data
-        print(json_data)
-        locations = json_data.get('locations', [[]])
+        locations = json_data.get('locations', [[]]) # in [[lat, long]] format
         print(locations)
 
-        # extract locations and sort according to their weights
-
-        resp = {
-            'msg': 'locations data required in [ [lat1, long1], [lat2, long2,], ... ] format'
-        }
-        status_code = 400
+        # locations = ((80.21787585263182,6.025423265401452),(80.23929481745174,6.019639381180123))
 
         # create Map
-        map = Map(location=locations[0], zoom_start=15)
+        map = Map(location=locations[0], zoom_start=30, control_scale=True)
             
-        # get route co-ords
-        # geojson_data, status_code = get_geojson_route_cordinates(cordinates=locations)
+        # get route data
+        route_data, status_code = get_route_data(cordinates=locations)
+        print(route_data)
 
-        # if status_code != 200:
-        #     err = geojson_data
-        #     return Response({'err':err})
+        if status_code != 200:
+            err = route_data
+            return Response({'err':err})
             
         # plot data on map
-        # plot_geojson_data_on_map(geojson=geojson_data, map=map)
-
+        route_plot_map = plot_geojson_data_on_map(route_data=route_data, map=map)
+        print('GeoJSON data plotted')
 
         # add markers
-        add_markers_to_map(co_ordinates=locations, map=map)
+        plot_map_with_marker = add_markers_to_map(co_ordinates=locations, map=route_plot_map)
+        print('-'*50)
 
         # return map in html format
-        return HttpResponse(map._repr_html_())
+        return HttpResponse(plot_map_with_marker._repr_html_())
 
 
 
