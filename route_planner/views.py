@@ -10,7 +10,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 
-from .utils import sanitize, to_cordinates, get_route_data, plot_geojson_data_on_map, add_markers_to_map, get_shortest_distance
+from .utils import sanitize, to_cordinates, add_locations_to_map, get_shortest_distance
 from .models import GarbageBinLocation
 from .serializer import GarbageBinLocationSerializer
 
@@ -39,8 +39,6 @@ routes = dict()
 
 
 class MapViewSet(ReadOnlyModelViewSet):
-    # parse JSON data automatically
-    # parser_classes = [JSONParser]
     queryset = GarbageBinLocation.objects.all()
     serializer_class = GarbageBinLocationSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -48,6 +46,9 @@ class MapViewSet(ReadOnlyModelViewSet):
     # cache requested url for each user for 2 hours
     @method_decorator(cache_page(60*60*2))
     def create(self, request):
+        '''
+        HTTP POST request 
+        '''
         # get location from request url
         location = to_cordinates(
             sanitize(request.GET.get('location', None))
@@ -70,38 +71,14 @@ class MapViewSet(ReadOnlyModelViewSet):
         # return map in html format
         return HttpResponse(map._repr_html_())
 
-    def list(self, request: Request):
-        # json_data = request.data
-        # locations = json_data.get('locations', [[]])  # in [[lat, long]] format
-
+    # cache requested url for each user for 1 hour
+    @method_decorator(cache_page(60*60*1))
+    def list(self, _: Request):
+        '''
+        HTTP GET request returns optimal route direction map visiting 
+        all GarbageBinLocations
+        '''
         locations = self.get_queryset()
-        for location in locations:
-            print(type(location), location)
-
-        # return HttpResponse(str(locations))
-        # locations = ((80.21787585263182,6.025423265401452),(80.23929481745174,6.019639381180123))
-
-        # create Map
-        # map = Map(location=locations[0], zoom_start=30, control_scale=True)
-
-        # # get route data
-        # route_data, status_code = get_route_data(cordinates=locations)
-        # print(route_data)
-
-        # if status_code != 200:
-        #     err = route_data
-        #     return Response({'err':err})
-
-        # # plot data on map
-        # route_plot_map = plot_geojson_data_on_map(route_data=route_data, map=map)
-        # print('GeoJSON data plotted')
-
-        # # add markers
-        # plot_map_with_marker = add_markers_to_map(co_ordinates=locations, map=route_plot_map)
-        # print('-'*50)
-
-        # # return map in html format
-        # return HttpResponse(plot_map_with_marker._repr_html_())
 
         start_loc: GarbageBinLocation = locations[0]
         end_loc: GarbageBinLocation = locations[1]
@@ -128,7 +105,6 @@ class MapViewSet(ReadOnlyModelViewSet):
             dest_nodes,
             weight=optimizer
         )
-        print(shortest_route)
 
         # TODO: visit each node once and plot route optimally
         # create map for shortest distance
@@ -136,17 +112,8 @@ class MapViewSet(ReadOnlyModelViewSet):
             graph, shortest_route, route_map=None, tiles='openstreetmap')
 
         # add markers
-        Marker(
-            location=start_latlng,
-            tooltip='Start Location',
-            popup=str(start_latlng)
-        ).add_to(shortest_route_map)
-
-        Marker(
-            location=end_latlng,
-            tooltip='End Location',
-            popup=str(end_latlng)
-        ).add_to(shortest_route_map)
+        shortest_route_map = add_locations_to_map(
+            locations=locations, map=shortest_route_map)
 
         return HttpResponse(shortest_route_map._repr_html_())
 
@@ -154,13 +121,14 @@ class MapViewSet(ReadOnlyModelViewSet):
 # /api/route-mapper/update-routes
 @api_view(['GET'])
 def update_routes_data(request):
+    '''
+    Apply Djikstra's algorithm and store result in global variable which will be 
+    used when user sends GET request on /api/route-mapper/map endpoint
+    '''
     # call this endpoint after updating GarbageBinLocations data from Admin panel to
     # update routes global variable
     global routes
-    # Apply Djikstra's algorithm and store result in global variable which will be 
-    # used when user sends GET request on /api/route-mapper/map endpoint
 
-    # return status
     status_code = 201
     msg = 'Routes Updated'
     try:
