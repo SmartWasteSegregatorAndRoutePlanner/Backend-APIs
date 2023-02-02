@@ -4,6 +4,11 @@ from openrouteservice import Client
 from openrouteservice.exceptions import ApiError
 from openrouteservice.convert import decode_polyline
 from html import escape
+from .models import GarbageBinLocation
+
+
+import osmnx as ox
+import networkx as nx
 
 # ors client
 ors_client = Client(key=ORS_API_KEY)
@@ -83,3 +88,35 @@ def add_markers_to_map(co_ordinates: list[list[float]], map: Map):
 
 def sanitize(data: str) -> str:
     return escape(str(data))
+
+def get_shortest_distance(start_loc:GarbageBinLocation, end_loc:GarbageBinLocation):
+    '''
+    Returns shortest distance between two Garbage Bin locations
+    '''
+    start_latlng = (start_loc.latitude, start_loc.longitude)
+    end_latlng = (end_loc.latitude, end_loc.longitude)
+
+    mode = 'drive'  # 'drive', 'bike', 'walk'# find shortest path based on distance or time
+    optimizer = 'length'  # 'length','time'
+
+    # create graph from point
+    graph = ox.graph_from_point(
+        center_point=start_latlng, dist=4000, network_type=mode)
+
+    # find the nearest node to the end location
+    orig_nodes = ox.nearest_nodes(
+        graph, X=start_latlng[1], Y=start_latlng[0])
+    dest_nodes = ox.nearest_nodes(
+        graph, X=end_latlng[1], Y=end_latlng[0])  # find the shortest path
+    
+    try:
+        shortest_route = nx.shortest_path(
+            graph,
+            orig_nodes,
+            dest_nodes,
+            weight=optimizer
+        )
+    except nx.exception.NetworkXNoPath:
+        shortest_route = None
+        
+    return shortest_route
