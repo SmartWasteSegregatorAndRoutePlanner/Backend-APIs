@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'route_planner',
+    'route_planner.apps.RoutePlannerConfig',
 ]
 
 MIDDLEWARE = [
