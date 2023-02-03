@@ -1,6 +1,6 @@
 from django.shortcuts import HttpResponse
-from django.views.decorators.cache import cache_page
-from django.utils.decorators import method_decorator
+# from django.views.decorators.cache import cache_page
+# from django.utils.decorators import method_decorator
 from folium import Map, Marker, CircleMarker
 from itertools import combinations
 from rest_framework.decorators import api_view
@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.request import Request
 from rest_framework.response import Response
-
+from pprint import pprint
 
 from .utils import sanitize, to_cordinates, add_locations_to_map, get_shortest_distance
 from .models import GarbageBinLocation
@@ -20,7 +20,7 @@ import networkx as nx
 import logging
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG,
+logging.basicConfig(level=logging.INFO,
                     format='[%(asctime)s] [%(levelname)s] - %(message)s')
 
 
@@ -44,10 +44,10 @@ class MapViewSet(ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     # cache requested url for each user for 2 hours
-    @method_decorator(cache_page(60*60*2))
+    # @method_decorator(cache_page(60*60*2))
     def create(self, request):
         '''
-        HTTP POST request 
+        HTTP POST request
         '''
         # get location from request url
         location = to_cordinates(
@@ -72,44 +72,38 @@ class MapViewSet(ReadOnlyModelViewSet):
         return HttpResponse(map._repr_html_())
 
     # cache requested url for each user for 1 hour
-    @method_decorator(cache_page(60*60*1))
+    # @method_decorator(cache_page(60*60*1))
     def list(self, _: Request):
         '''
-        HTTP GET request returns optimal route direction map visiting 
+        HTTP GET request returns optimal route direction map visiting
         all GarbageBinLocations
         '''
+        pprint(routes)
+        if not routes:
+            return Response({'msg': 'Update Routes before sending request to this endpoint'}, status=500, content_type='application/json')
+
         locations = self.get_queryset()
 
-        start_loc: GarbageBinLocation = locations[0]
-        end_loc: GarbageBinLocation = locations[1]
+        # remove empty garbage bin locations
+        locations = list(filter(lambda loc: loc.garbage_weight > 0, locations))
+        logger.debug(f'Filtered Locations: {locations}')
 
-        start_latlng = (start_loc.latitude, start_loc.longitude)
-        end_latlng = (end_loc.latitude, end_loc.longitude)
-
-        mode = 'drive'  # 'drive', 'bike', 'walk'# find shortest path based on distance or time
-        optimizer = 'length'  # 'length','time'
-
-        # create graph from point
-        graph = ox.graph_from_point(
-            center_point=start_latlng, dist=4000, network_type=mode)
-
-        # find the nearest node to the end location
-        orig_nodes = ox.nearest_nodes(
-            graph, X=start_latlng[1], Y=start_latlng[0])
-        dest_nodes = ox.nearest_nodes(
-            graph, X=end_latlng[1], Y=end_latlng[0])  # find the shortest path
-
-        shortest_route = nx.shortest_path(
-            graph,
-            orig_nodes,
-            dest_nodes,
-            weight=optimizer
-        )
+        # TODO: consider locations and apply djikstra's algorithm between locations
+        center_loc = locations[0]
+        graph = ox.graph_from_point(center_point=(
+            center_loc.latitude, center_loc.longitude), dist=4000, network_type='drive')
 
         # TODO: visit each node once and plot route optimally
         # create map for shortest distance
-        shortest_route_map = ox.plot_route_folium(
-            graph, shortest_route, route_map=None, tiles='openstreetmap')
+        shortest_route_map = Map()
+        for location in routes.keys():
+            location_data = routes.get(location)
+            route = location_data.get('path')
+            # if route is None skip that location
+            if route:
+                shortest_route_map = ox.plot_route_folium(
+                    G=graph, route=route, route_map=shortest_route_map, tiles='openstreetmap')
+                # logger.info(f'Route plotted between {}')
 
         # add markers
         shortest_route_map = add_locations_to_map(
@@ -120,9 +114,10 @@ class MapViewSet(ReadOnlyModelViewSet):
 
 # /api/route-mapper/update-routes
 @api_view(['GET'])
+# @cache_page(60*60*1)
 def update_routes_data(request):
     '''
-    Apply Djikstra's algorithm and store result in global variable which will be 
+    Apply Djikstra's algorithm and store result in global variable which will be
     used when user sends GET request on /api/route-mapper/map endpoint
     '''
     # call this endpoint after updating GarbageBinLocations data from Admin panel to
@@ -131,27 +126,37 @@ def update_routes_data(request):
 
     status_code = 201
     msg = 'Routes Updated'
-    try:
-        # create routes from every location to another location in local memory
-        garbage_bin_locations: list[GarbageBinLocation] = set(
-            GarbageBinLocation.objects.all())
+    # try:
+    # create routes from every location to another location in local memory
+    garbage_bin_locations: list[GarbageBinLocation] = set(
+        GarbageBinLocation.objects.all())
 
-        # map routes between garbage_bin_locations
-        for src_dst_pair in combinations(garbage_bin_locations, 2):
-            # extract src and dst nodes
-            src_gb_loc = src_dst_pair[0]
-            trgt_gb_loc = src_dst_pair[1]
+    # map routes between garbage_bin_locations
+    for src_dst_pair in combinations(garbage_bin_locations, 2):
+        # extract src and dst nodes
+        src_gb_loc = src_dst_pair[0]
+        trgt_gb_loc = src_dst_pair[1]
 
-            # calculate route and store it global variable
-            shortest_distance = get_shortest_distance(
-                start_loc=src_gb_loc, end_loc=trgt_gb_loc)
-            route = {trgt_gb_loc.name: shortest_distance}
-            routes[src_gb_loc.name] = route
-            logging.debug(
-                f'Route Calculated Between {src_gb_loc.name} - {trgt_gb_loc.name}')
+        # calculate route and store it global variable
+        shortest_distance = get_shortest_distance(
+            start_loc=src_gb_loc, end_loc=trgt_gb_loc)
+        distance = ox.distance.great_circle_vec(
+            src_gb_loc.latitude, src_gb_loc.longitude, trgt_gb_loc.latitude, trgt_gb_loc.longitude)
 
-    except Exception as e:
-        msg = 'Error, Check logs for more info'
-        status_code = 500
+        # get and update previous data
+        route = routes.get(src_gb_loc.name,{})
+        route[trgt_gb_loc.name] = {
+            'path': shortest_distance,
+            'distance': distance
+        }
+        routes[src_gb_loc.name] = route
+        logging.info(
+            f'Route Calculated Between {src_gb_loc.name} - {trgt_gb_loc.name}, distance: {distance}')
+
+    # except Exception:
+        # msg = 'Error, Check logs for more info'
+        # status_code = 500
+
+    pprint(routes)
 
     return Response({'msg': msg}, status=status_code, content_type='application/json')

@@ -6,6 +6,7 @@ from .models import GarbageBinLocation
 import osmnx as ox
 import networkx as nx
 
+
 def to_cordinates(location: str, default: tuple[float] = (28.653458, 77.123767)):
     assert isinstance(location, str)
 
