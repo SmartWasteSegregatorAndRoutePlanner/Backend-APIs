@@ -1,6 +1,6 @@
 from django.shortcuts import HttpResponse
-# from django.views.decorators.cache import cache_page
-# from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
 from folium import Map, Marker, CircleMarker
 from itertools import combinations
 from rest_framework.decorators import api_view
@@ -35,15 +35,13 @@ routes = read_routes()
 
 # Endpoint
 # /api/route-mapper/map
-
-
 class MapViewSet(ReadOnlyModelViewSet):
     queryset = GarbageBinLocation.objects.all()
     serializer_class = GarbageBinLocationSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     # cache requested url for each user for 2 hours
-    # @method_decorator(cache_page(60*60*2))
+    @method_decorator(cache_page(60*60*2))
     def create(self, request):
         '''
         HTTP POST request
@@ -71,7 +69,7 @@ class MapViewSet(ReadOnlyModelViewSet):
         return HttpResponse(map._repr_html_())
 
     # cache requested url for each user for 1 hour
-    # @method_decorator(cache_page(60*60*1))
+    @method_decorator(cache_page(60*60*1))
     def list(self, _: Request):
         '''
         HTTP GET request returns optimal route direction map visiting
@@ -86,7 +84,6 @@ class MapViewSet(ReadOnlyModelViewSet):
         locations = list(filter(lambda loc: loc.garbage_weight > 0, locations))
         logger.debug(f'Filtered Locations: {locations}')
 
-        # TODO: consider locations and apply djikstra's algorithm between locations
         center_loc = locations[0]
         center_loc = (center_loc.latitude, center_loc.longitude)
         # BUG: If you're getting some sort of key error then increase distance value
@@ -126,7 +123,7 @@ class MapViewSet(ReadOnlyModelViewSet):
 
 # /api/route-mapper/update-routes
 @api_view(['GET'])
-# @cache_page(60*60*1)
+@cache_page(60*60*1)
 def update_routes_data(request):
     '''
     Apply Djikstra's algorithm and store result in global variable which will be
