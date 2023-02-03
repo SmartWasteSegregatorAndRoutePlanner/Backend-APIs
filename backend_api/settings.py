@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 from dotenv import load_dotenv, find_dotenv
 from os import environ
+from os.path import join as path_join
 
 # load .env file
 load_dotenv(find_dotenv())
@@ -136,3 +137,6 @@ REST_FRAMEWORK = {
         # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
 }
+
+# to store routes
+ROUTES_DATA_FILE_PATH = path_join(BASE_DIR, 'cache', 'routes.json')

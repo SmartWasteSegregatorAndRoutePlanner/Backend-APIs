@@ -1,7 +1,9 @@
+from backend_api.settings import ROUTES_DATA_FILE_PATH
+from json import loads,dumps
 from folium import Map, Marker
 from html import escape
+from os.path import isfile
 from .models import GarbageBinLocation
-
 
 import osmnx as ox
 import networkx as nx
@@ -35,6 +37,7 @@ def add_locations_to_map(locations: list[GarbageBinLocation], map: Map):
 def sanitize(data: str) -> str:
     return escape(str(data))
 
+
 def get_shortest_distance(start_loc:GarbageBinLocation, end_loc:GarbageBinLocation):
     '''
     Returns shortest distance between two Garbage Bin locations
@@ -66,3 +69,17 @@ def get_shortest_distance(start_loc:GarbageBinLocation, end_loc:GarbageBinLocati
         shortest_route = None
         
     return shortest_route
+
+
+def save_routes(routes:dict={}):
+    with open(ROUTES_DATA_FILE_PATH, 'w') as f:
+        f.write(dumps(routes))
+
+def read_routes() -> dict:
+    # create empty json data if file does 
+    # not exist
+    if not isfile(ROUTES_DATA_FILE_PATH):
+        save_routes()
+
+    with open(ROUTES_DATA_FILE_PATH, 'r') as f:
+        return loads(f.read())

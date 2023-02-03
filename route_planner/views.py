@@ -10,7 +10,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from pprint import pprint
 
-from .utils import sanitize, to_cordinates, add_locations_to_map, get_shortest_distance
+from .utils import sanitize, to_cordinates, add_locations_to_map, get_shortest_distance, save_routes, read_routes
 from .models import GarbageBinLocation
 from .serializer import GarbageBinLocationSerializer
 
@@ -26,6 +26,7 @@ logging.basicConfig(level=logging.INFO,
 
 # Global variable to store routes between location
 routes = dict()
+routes = read_routes()
 
 # HTTP Method: class function
 # GET: list
@@ -90,12 +91,12 @@ class MapViewSet(ReadOnlyModelViewSet):
 
         # TODO: consider locations and apply djikstra's algorithm between locations
         center_loc = locations[0]
-        graph = ox.graph_from_point(center_point=(
-            center_loc.latitude, center_loc.longitude), dist=4000, network_type='drive')
+        center_loc = (center_loc.latitude, center_loc.longitude)
+        graph = ox.graph_from_point(center_point=center_loc, dist=4000, network_type='drive')
 
         # TODO: visit each node once and plot route optimally
         # create map for shortest distance
-        shortest_route_map = Map()
+        shortest_route_map = Map(location=center_loc)
         for location in routes.keys():
             location_data = routes.get(location)
             route = location_data.get('path')
@@ -152,6 +153,7 @@ def update_routes_data(request):
         routes[src_gb_loc.name] = route
         logging.info(
             f'Route Calculated Between {src_gb_loc.name} - {trgt_gb_loc.name}, distance: {distance}')
+    save_routes(routes)
 
     # except Exception:
         # msg = 'Error, Check logs for more info'
