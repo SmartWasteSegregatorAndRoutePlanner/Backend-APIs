@@ -1,10 +1,6 @@
 # Backend APIs
 
-This repo contains backend APIs for Smart Waste Segregator and Route Planner
-
-### Latest Build Status
-
-![Heroku Deployment WorkFlow](https://github.com/SmartWasteSegregatorAndRoutePlanner/Backend-APIs/actions/workflows/main.yml/badge.svg)
+This repo contains backend REST API for Smart Waste Segregator and Route Planner.
 
 ## Installation
 
@@ -21,18 +17,48 @@ This repo contains backend APIs for Smart Waste Segregator and Route Planner
   ```
 
 - Install requirements
+  
+  - Install [Poetry](https://python-poetry.org/docs/)
+  
+  - Install virtualenv
+  
+    ```bash
+    python -m pip install virtualenv
+    ```
+
+  - Create Virtual env
+  
+    ```bash
+    python -m virtualenv env
+    ```
+
+- Install dependencies
 
   ```bash
-  python -m pip install -r requirements
+  poetry install
+  ```
+
+- Create Migrations
+
+  ```bash
+  python manage.py makemigrations
+  ```
+
+- Migrate DB
+
+  ```bash
+  python manage.py migrate
   ```
 
 - Start Web Application
 
   ```bash
-  python main.py
+  python manage.py runserver 0.0.0.0:8000
   ```
 
-## Installation Error Cases for Windows
+  > **Note**: Allow Port `8000` through firewall.
+
+## Common Installation Error Fix Cases on Windows
 
 - Check python installed arch version using
 
@@ -48,18 +74,3 @@ This repo contains backend APIs for Smart Waste Segregator and Route Planner
   ```
 
   > Note: Check python version 3.x and cpu arch then download wheel file accordingly
-
-## Run During Development
-
-- Start project with devtools
-
-  ```bash
-  adev runserver .
-  ```
-
-## Running with Normal Configuration
-
-```bash
-python main.py
-```
-

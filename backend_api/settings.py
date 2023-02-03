@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 from dotenv import load_dotenv, find_dotenv
 from os import environ
+from os.path import join as path_join
 
 # load .env file
 load_dotenv(find_dotenv())
@@ -43,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'route_planner',
+    'route_planner.apps.RoutePlannerConfig',
 ]
 
 MIDDLEWARE = [
@@ -137,5 +138,5 @@ REST_FRAMEWORK = {
     ]
 }
 
-# ENVIRON VARS
-ORS_API_KEY = environ.get('ORS_API_KEY')
+# to store routes
+ROUTES_DATA_FILE_PATH = path_join(BASE_DIR, 'cache', 'routes.json')
