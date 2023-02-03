@@ -8,8 +8,6 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.request import Request
 from rest_framework.response import Response
-from pprint import pprint
-
 from .utils import sanitize, to_cordinates, add_locations_to_map, get_shortest_distance, save_routes, read_routes
 from .models import GarbageBinLocation
 from .serializer import GarbageBinLocationSerializer
@@ -99,19 +97,25 @@ class MapViewSet(ReadOnlyModelViewSet):
         # create base map
         shortest_route_map = Map(location=center_loc)
 
-        # consider minimum distance as optimal path using djikstra's algorithm
+        # It's Kruksal's Algorithm variant.
+        # after generating populating routes variable we'll have distances between 
+        # unique locations so consider minimum distance in a nested key value pair
+        # to get shortest route. Refer BASE_DIR/cache/routes.json to get clear 
+        # idea.  
         for src_location in routes.keys():
+            distance = 999999999999999
             for dst_location in routes[src_location].keys():
-                
-                # TODO: Use Kruksal's algorithm to find minimum spanning tree and then plot routes 
-                route = None
+                # if dist b/w src and location is less than inf and route exists then consider it as minimum path.
+                if routes[src_location][dst_location]['distance'] < distance and routes[src_location][dst_location]['path']:
+                    distance = routes[src_location][dst_location]['distance']
+                    route = routes[src_location][dst_location]['path']
 
-                # plot route on map if present
-                if route:
-                    shortest_route_map = ox.plot_route_folium(
-                        G=graph, route=route, route_map=shortest_route_map, tiles='openstreetmap')
-                    logger.info(
-                        f'Route plotted between {src_location} - {dst_location}')
+            # plot route on map if present
+            if route:
+                shortest_route_map = ox.plot_route_folium(
+                    G=graph, route=route, route_map=shortest_route_map, tiles='openstreetmap')
+                logger.info(
+                    f'Route plotted between {src_location} - {dst_location}')
 
         # add markers
         shortest_route_map = add_locations_to_map(
