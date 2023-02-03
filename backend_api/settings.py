@@ -44,7 +44,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'route_planner.apps.RoutePlannerConfig',
+    'dj_rest_auth'
 ]
 
 MIDDLEWARE = [
@@ -135,8 +137,14 @@ REST_FRAMEWORK = {
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
         # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+    )
 }
+REST_USE_JWT = True
+JWT_AUTH_COOKIE = 'X-JWT-AUTH-COOKIE'
+JWT_AUTH_REFRESH_COOKIE = 'X-JWT-AUTH-REFRESH-COOKIE'
 
 # to store routes
 ROUTES_DATA_FILE_PATH = path_join(BASE_DIR, 'cache', 'routes.json')
