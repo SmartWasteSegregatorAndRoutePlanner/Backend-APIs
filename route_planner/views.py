@@ -79,7 +79,6 @@ class MapViewSet(ReadOnlyModelViewSet):
         HTTP GET request returns optimal route direction map visiting
         all GarbageBinLocations
         '''
-        pprint(routes)
         if not routes:
             return Response({'msg': 'Update Routes before sending request to this endpoint'}, status=500, content_type='application/json')
 
@@ -92,19 +91,23 @@ class MapViewSet(ReadOnlyModelViewSet):
         # TODO: consider locations and apply djikstra's algorithm between locations
         center_loc = locations[0]
         center_loc = (center_loc.latitude, center_loc.longitude)
-        graph = ox.graph_from_point(center_point=center_loc, dist=4000, network_type='drive')
+        # BUG: If you're getting some sort of key error then increase distance value
+        graph:nx.classes.multidigraph.MultiDiGraph = ox.graph_from_point(center_point=center_loc, dist=10000, network_type='drive')
+        logging.info(f'Center Location: {locations[0]}')
+        print(graph)
 
         # TODO: visit each node once and plot route optimally
         # create map for shortest distance
         shortest_route_map = Map(location=center_loc)
-        for location in routes.keys():
-            location_data = routes.get(location)
-            route = location_data.get('path')
-            # if route is None skip that location
-            if route:
-                shortest_route_map = ox.plot_route_folium(
-                    G=graph, route=route, route_map=shortest_route_map, tiles='openstreetmap')
-                # logger.info(f'Route plotted between {}')
+        for src_location in routes.keys():
+            for dst_location in routes[src_location].keys():
+                route = routes[src_location][dst_location]['path']
+                # if route is None skip that location
+                if route:
+                    shortest_route_map = ox.plot_route_folium(
+                        G=graph, route=route, route_map=shortest_route_map, tiles='openstreetmap')
+                    logger.info(f'Route plotted between {src_location} - {dst_location}')
+                    
 
         # add markers
         shortest_route_map = add_locations_to_map(
@@ -158,7 +161,5 @@ def update_routes_data(request):
     # except Exception:
         # msg = 'Error, Check logs for more info'
         # status_code = 500
-
-    pprint(routes)
 
     return Response({'msg': msg}, status=status_code, content_type='application/json')
