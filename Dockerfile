@@ -64,4 +64,4 @@ RUN python manage.py createsuperuser --noinput
 EXPOSE 8000
 
 # start application
-CMD [ "gunicorn", "backend_api.wsgi", "-b", "127.0.0.1:8000" ]
+CMD [ "gunicorn", "backend_api.wsgi", "-b", "0.0.0.0:8000" ]
