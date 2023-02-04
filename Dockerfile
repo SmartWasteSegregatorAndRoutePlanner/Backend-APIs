@@ -45,19 +45,21 @@ RUN python manage.py makemigrations
 RUN python manage.py migrate
 
 # collect static images
-# RUN python manage.py collectstatic
+RUN python manage.py collectstatic
 
 # get build arguments (credentials)
 ARG dj_email=admin@localhost
 ARG dj_username=admin
 ARG dj_password=admin
 ARG dj_allowed_host=*
+ARG dj_debug=false
 
 # create superuser
 ENV DJANGO_SUPERUSER_EMAIL=${dj_email}
 ENV DJANGO_SUPERUSER_USERNAME=${dj_username}
 ENV DJANGO_SUPERUSER_PASSWORD=${dj_password}
 ENV ALLOWED_HOSTS=${dj_allowed_host}
+ENV DEBUG=${dj_debug}
 RUN python manage.py createsuperuser --noinput
 
 # expose ports
