@@ -43,6 +43,8 @@ RUN python manage.py check
 # migrate database
 RUN python manage.py makemigrations
 RUN python manage.py migrate
+# --run-syncdb creates table without migrations
+RUN python manage.py migrate --run-syncdb 
 
 # collect static images
 RUN python manage.py collectstatic
