@@ -1,0 +1,6 @@
+services:
+  swsrp-backend:
+    image: dmdhrumilmistry/swsrp-backend-api
+    ports:
+      - 8000:8000
+    

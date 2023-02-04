@@ -2,8 +2,12 @@ from backend_api.settings import ROUTES_DATA_FILE_PATH
 from json import loads,dumps
 from folium import Map, Marker
 from html import escape
-from os.path import isfile
+from os import makedirs
+from os.path import isfile, isdir, dirname
+
+
 from .models import GarbageBinLocation
+
 
 import osmnx as ox
 import networkx as nx
@@ -72,6 +76,10 @@ def get_shortest_distance(start_loc:GarbageBinLocation, end_loc:GarbageBinLocati
 
 
 def save_routes(routes:dict={}):
+    dir = dirname(ROUTES_DATA_FILE_PATH)
+    if not isdir(dir):
+        makedirs(dir)
+
     with open(ROUTES_DATA_FILE_PATH, 'w') as f:
         f.write(dumps(routes))
 
