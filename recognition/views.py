@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.request import Request
 from rest_framework.response import Response
-from base64 import b64encode
 
 from .utils import detect_labels
 
@@ -12,17 +12,18 @@ class ImageLabelRecognizer(APIView):
     '''
     Recognize the labels in image using amazon's Rekognition service
     '''
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def post(self, request: Request):
         msg = {'msg': 'image_file not provided'}
         status_code = 400
-        file_obj = request.FILES.get('image_file', False)
+        img_file = request.FILES.get('image_file', False)
 
-        # if file_obj and not file_obj.readable():
+        # if img_file and not img_file.readable():
         #     msg = {'msg':'image_file not readable'}
         #     status_code = 400
-        # elif file_obj:
-        #     labels = detect_labels(file_obj.read())
+        # elif img_file:
+        #     labels = detect_labels(img_file.read())
         #     if labels:
         #         msg = {
         #             'labels':labels,
