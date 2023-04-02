@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'route_planner.apps.RoutePlannerConfig',
-    'dj_rest_auth'
+    'dj_rest_auth',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
