@@ -29,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = environ.get('DJANGO_SECRET_KEY', get_random_secret_key())
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = environ.get('DEBUG', False)
+DEBUG = True if environ.get('DEBUG', 'False').lower() == 'true' else False
 
 ALLOWED_HOSTS = environ.get('ALLOWED_HOSTS', 'localhost 127.0.0.1').split(' ')
 
@@ -149,3 +149,7 @@ JWT_AUTH_REFRESH_COOKIE = 'X-JWT-AUTH-REFRESH-COOKIE'
 
 # to store routes
 ROUTES_DATA_FILE_PATH = path_join(BASE_DIR, 'cache', 'routes.json')
+
+## AWS REKOGNITION ACCESS CONFIG
+AWS_REKOG_ACCESS_KEY = environ.get('AWS_REKOG_ACCESS_KEY', False)
+AWS_REKOG_SECRET_ACCESS_KEY = environ.get('AWS_REKOG_SECRET_ACCESS_KEY', False)
