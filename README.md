@@ -2,6 +2,34 @@
 
 This repo contains backend REST API for Smart Waste Segregator and Route Planner.
 
+## Prerequisites
+
+### AWS 
+
+- Create new user for AWS Rekognition service from IAM dashboard
+
+- Create new policy with below JSON rules
+
+  ```json
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualRecognitionAccess",
+            "Effect": "Allow",
+            "Action": [
+                "rekognition:DetectLabels"
+            ],
+            "Resource": "*"
+        }
+    ]
+  }
+  ```
+
+- Create programmatic access keys for the user
+
+- Update access keys in `.env` file
+
 ## Installation
 
 - clone/download this repo
@@ -54,6 +82,23 @@ This repo contains backend REST API for Smart Waste Segregator and Route Planner
 
   ```bash
   python manage.py collectstatic
+  ```
+
+- Generate DJANGO_SECRET_KEY using below command:
+
+  ```bash
+  python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key());"
+  ```
+
+- Update `.env` file
+
+  ```bash
+  DJANGO_SECRET_KEY=l#kcn**xhq(mux@h4w_+nk1n($y2krhgoo9mab5ur^ebgh8y(6
+  DEBUG=False
+  ALLOWED_HOSTS=*
+  AWS_ACCESS_KEY_ID=your-aws-access-key-id
+  AWS_SECRET_ACCESS_KEY=your-aws-secret-access-key
+  AWS_DEFAULT_REGION=your-aws-region
   ```
 
 - Start Web Application

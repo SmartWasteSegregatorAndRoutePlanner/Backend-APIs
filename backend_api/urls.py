@@ -19,7 +19,8 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/route-planner/', include('route_planner.urls')),
-    path('api/auth/', include('dj_rest_auth.urls'))
+    path('api/recognition/', include('recognition.urls')),
+    path('api/auth/', include('dj_rest_auth.urls')),
 ]
 
 admin.site.site_header = "Smart Waste Segregation and Route Planner Admin Page"

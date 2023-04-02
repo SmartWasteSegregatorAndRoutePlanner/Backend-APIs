@@ -20,6 +20,7 @@ scikit-learn = "^1.2.1"
 dj-rest-auth = "^2.2.7"
 djangorestframework-simplejwt = "^5.2.2"
 whitenoise = "^6.3.0"
+boto3 = "^1.26.104"
 
 
 [build-system]

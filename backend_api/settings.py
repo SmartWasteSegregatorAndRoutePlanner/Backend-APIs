@@ -29,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = environ.get('DJANGO_SECRET_KEY', get_random_secret_key())
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = environ.get('DEBUG', False)
+DEBUG = True if environ.get('DEBUG', 'False').lower() == 'true' else False
 
 ALLOWED_HOSTS = environ.get('ALLOWED_HOSTS', 'localhost 127.0.0.1').split(' ')
 
@@ -141,8 +141,10 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
-    )
+    ),
+    'DEFAULT_METADATA_CLASS': None, # disable options method on all endpoints
 }
+
 REST_USE_JWT = True
 JWT_AUTH_COOKIE = 'X-JWT-AUTH-COOKIE'
 JWT_AUTH_REFRESH_COOKIE = 'X-JWT-AUTH-REFRESH-COOKIE'
