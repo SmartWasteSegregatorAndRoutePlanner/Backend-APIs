@@ -49,6 +49,12 @@ This repo contains backend REST API for Smart Waste Segregator and Route Planner
   ```bash
   python manage.py migrate
   ```
+  
+- Collect Static Files
+
+  ```bash
+  python manage.py collectstatic
+  ```
 
 - Start Web Application
 
