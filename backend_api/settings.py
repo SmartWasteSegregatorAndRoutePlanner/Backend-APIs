@@ -141,15 +141,13 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
-    )
+    ),
+    'DEFAULT_METADATA_CLASS': None, # disable options method on all endpoints
 }
+
 REST_USE_JWT = True
 JWT_AUTH_COOKIE = 'X-JWT-AUTH-COOKIE'
 JWT_AUTH_REFRESH_COOKIE = 'X-JWT-AUTH-REFRESH-COOKIE'
 
 # to store routes
 ROUTES_DATA_FILE_PATH = path_join(BASE_DIR, 'cache', 'routes.json')
-
-## AWS REKOGNITION ACCESS CONFIG
-AWS_REKOG_ACCESS_KEY = environ.get('AWS_REKOG_ACCESS_KEY', False)
-AWS_REKOG_SECRET_ACCESS_KEY = environ.get('AWS_REKOG_SECRET_ACCESS_KEY', False)

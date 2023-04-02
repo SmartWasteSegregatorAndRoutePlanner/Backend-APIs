@@ -96,8 +96,9 @@ This repo contains backend REST API for Smart Waste Segregator and Route Planner
   DJANGO_SECRET_KEY=l#kcn**xhq(mux@h4w_+nk1n($y2krhgoo9mab5ur^ebgh8y(6
   DEBUG=False
   ALLOWED_HOSTS=*
-  AWS_REKOG_ACCESS_KEY=your-user-access-key
-  AWS_REKOG_SECRET_ACCESS_KEY=your-user-secret-access-key
+  AWS_ACCESS_KEY_ID=your-aws-access-key-id
+  AWS_SECRET_ACCESS_KEY=your-aws-secret-access-key
+  AWS_DEFAULT_REGION=your-aws-region
   ```
 
 - Start Web Application
