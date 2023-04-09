@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
+from datetime import timedelta
 from django.core.management.utils import get_random_secret_key
 from dotenv import load_dotenv, find_dotenv
 from pathlib import Path
@@ -43,9 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'rest_framework.authtoken',
+    'rest_framework_simplejwt',
     'route_planner.apps.RoutePlannerConfig',
-    'dj_rest_auth',
     'drf_yasg',
 ]
 
@@ -141,14 +141,15 @@ REST_FRAMEWORK = {
         # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_METADATA_CLASS': None, # disable options method on all endpoints
 }
 
-REST_USE_JWT = True
-JWT_AUTH_COOKIE = 'X-JWT-AUTH-COOKIE'
-JWT_AUTH_REFRESH_COOKIE = 'X-JWT-AUTH-REFRESH-COOKIE'
 
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=2),
+}
 # to store routes
 ROUTES_DATA_FILE_PATH = path_join(BASE_DIR, 'cache', 'routes.json')

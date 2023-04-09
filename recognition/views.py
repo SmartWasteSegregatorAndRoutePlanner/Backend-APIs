@@ -6,8 +6,6 @@ from rest_framework.response import Response
 from .utils import detect_labels
 
 # api/recognition/recognize
-
-
 class ImageLabelRecognizer(APIView):
     '''
     Recognize the labels in image using amazon's Rekognition service

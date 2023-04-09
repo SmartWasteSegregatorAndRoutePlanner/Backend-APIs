@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 
 schema_view = get_schema_view(
@@ -32,8 +33,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/route-planner/', include('route_planner.urls')),
     path('api/recognition/', include('recognition.urls')),
-    path('api/auth/', include('dj_rest_auth.urls')),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0)),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
 
 admin.site.site_header = "Smart Waste Segregation and Route Planner Admin Page"
