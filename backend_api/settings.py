@@ -50,6 +50,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -153,3 +154,10 @@ SIMPLE_JWT = {
 }
 # to store routes
 ROUTES_DATA_FILE_PATH = path_join(BASE_DIR, 'cache', 'routes.json')
+
+# CORS CONFIG
+CORS_ORIGIN_ALLOW_ALL=True
+# CORS_ORIGIN_WHITELIST = [
+#     'http://localhost:8000',
+#     'http://localhost:5500',
+# ]

@@ -3,8 +3,8 @@ from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from folium import Map, Marker, CircleMarker
 from itertools import combinations
-from rest_framework.decorators import api_view
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -38,7 +38,7 @@ routes = read_routes()
 class MapViewSet(ReadOnlyModelViewSet):
     queryset = GarbageBinLocation.objects.all()
     serializer_class = GarbageBinLocationSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
     # cache requested url for each user for 2 hours
     @method_decorator(cache_page(60*60*2))
@@ -123,6 +123,7 @@ class MapViewSet(ReadOnlyModelViewSet):
 
 # /api/route-mapper/update-routes
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 @cache_page(60*60*1)
 def update_routes_data(request):
     '''
