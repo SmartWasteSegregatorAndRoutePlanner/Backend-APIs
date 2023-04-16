@@ -45,7 +45,7 @@ def classify_label(labels: list):
         }
     else:
         # create new label in db with None class
-        GarbageLabel(label=high_confidence_label).save()
+        GarbageLabel(label=high_confidence_label, label_class='None').save()
         msg = {
             'class': None,
             'label': high_confidence_label,
