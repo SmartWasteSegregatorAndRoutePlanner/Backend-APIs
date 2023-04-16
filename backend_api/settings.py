@@ -37,16 +37,22 @@ ALLOWED_HOSTS = environ.get('ALLOWED_HOSTS', 'localhost 127.0.0.1').split(' ')
 # Application definition
 
 INSTALLED_APPS = [
+    # Django Framework Apps 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # DRF Apps
     'rest_framework',
     'rest_framework_simplejwt',
-    'route_planner.apps.RoutePlannerConfig',
     'drf_yasg',
+
+    # Project Apps
+    'route_planner.apps.RoutePlannerConfig',
+    'recognition.apps.RecognitionConfig',
 ]
 
 MIDDLEWARE = [
