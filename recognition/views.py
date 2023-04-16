@@ -3,14 +3,15 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from .utils import detect_labels
+from .utils import detect_labels, classify_label
 
 # api/recognition/recognize
 class ImageLabelRecognizer(APIView):
     '''
     Recognize the labels in image using amazon's Rekognition service
     '''
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [
+        IsAuthenticatedOrReadOnly]  # making read only for time being, else esp will
 
     def post(self, request: Request):
         msg = {'msg': 'image_file not provided'}
@@ -23,9 +24,7 @@ class ImageLabelRecognizer(APIView):
         # elif img_file:
         #     labels = detect_labels(img_file.read())
         #     if labels:
-        #         msg = {
-        #             'labels':labels,
-        #         }
+        #         msg = classify_label(labels)
         #         status_code = 200
         #     else:
         #         msg = {
@@ -33,9 +32,13 @@ class ImageLabelRecognizer(APIView):
         #             'error':True,
         #         }
 
-
         # below var is only for development purpose
         labels = [
+            {
+                "Name": "Tin",
+                "Confidence": 94.43530731201172,
+                "Aliases": []
+            },
             {
                 "Name": "Plastic",
                 "Confidence": 98.45320892333984,
@@ -46,14 +49,8 @@ class ImageLabelRecognizer(APIView):
                 "Confidence": 94.63530731201172,
                 "Aliases": []
             },
-            {
-                "Name": "Tin",
-                "Confidence": 94.63530731201172,
-                "Aliases": []
-            }
         ]
-        msg = {'labels':labels}
-
-        # TODO: write logic to return only classified trash type
         
+        msg = classify_label(labels)
+
         return Response(msg, status=status_code, content_type='application/json')

@@ -1,9 +1,9 @@
 from django.db import models
 
 labels_class_choices = [
-    'RECYCLABLE', 'recyclable',
-    'NON-RECYCLABLE', 'non-recyclable',
-    'E-WASTE', 'e-waste',
+    ('RECYCLABLE', 'recyclable'),
+    ('NON-RECYCLABLE', 'non-recyclable'),
+    ('E-WASTE', 'e-waste'),
 ]
 
 class GarbageLabel(models.Model):
