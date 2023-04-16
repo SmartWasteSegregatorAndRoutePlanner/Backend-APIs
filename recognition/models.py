@@ -9,6 +9,7 @@ labels_class_choices = [
 class GarbageLabel(models.Model):
     label = models.CharField(max_length=255)
     label_class = models.CharField(max_length=100, choices=labels_class_choices, default=None)
+    is_configured = models.BooleanField(default=True)
     added_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateField(auto_now=True)
 

@@ -45,10 +45,24 @@ def classify_label(labels: list):
         }
     else:
         # create new label in db with None class
-        GarbageLabel(label=high_confidence_label, label_class='None').save()
+        GarbageLabel(label=high_confidence_label, label_class='None', is_configured=False).save()
         msg = {
             'class': None,
             'label': high_confidence_label,
             'error': f'{high_confidence_label} class is not classified. Add label class using admin page.'
         }
     return msg
+
+def get_unconfigured_labels() -> list:
+    unconfigured_labels = list(GarbageLabel.objects.filter(is_configured=False))
+    
+    labels = []
+    for label_obj in unconfigured_labels:
+        labels.append({
+            'id': label_obj.id,
+            'label': label_obj.label,
+            'added_on':label_obj.added_on,
+        })
+
+    return labels
+
