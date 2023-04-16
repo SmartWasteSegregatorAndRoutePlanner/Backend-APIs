@@ -23,15 +23,13 @@ class ImageLabelRecognizer(APIView):
                 'unconfigured_labels': unconfigured_labels,
                 'msg': 'success',
             }
-            status_code = 200
         else:
             msg = {
                 'unconfigured_labels': None,
                 'msg': 'possibly all labels are configured',
             }
-            status_code = 422
 
-        return Response(msg, status=status_code, content_type='application/json')
+        return Response(msg, status=200, content_type='application/json')
 
     def post(self, request: Request):
         msg = {'msg': 'image_file not provided'}
