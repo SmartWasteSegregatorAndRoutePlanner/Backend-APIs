@@ -13,7 +13,7 @@ class ImageLabelRecognizer(APIView):
     Recognize the labels in image using amazon's Rekognition service
     '''
     permission_classes = [
-        IsAuthenticatedOrReadOnly]  # making read only for time being, else esp will
+        IsAuthenticatedOrReadOnly]  # making read only for time being, else esp auth token ould need to be flashed again and again.
 
     def get(self, request: Request):
         unconfigured_labels = get_unconfigured_labels()
@@ -23,15 +23,13 @@ class ImageLabelRecognizer(APIView):
                 'unconfigured_labels': unconfigured_labels,
                 'msg': 'success',
             }
-            status_code = 200
         else:
             msg = {
                 'unconfigured_labels': None,
                 'msg': 'possibly all labels are configured',
             }
-            status_code = 422
 
-        return Response(msg, status=status_code, content_type='application/json')
+        return Response(msg, status=200, content_type='application/json')
 
     def post(self, request: Request):
         msg = {'msg': 'image_file not provided'}
