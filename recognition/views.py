@@ -13,7 +13,7 @@ class ImageLabelRecognizer(APIView):
     Recognize the labels in image using amazon's Rekognition service
     '''
     permission_classes = [
-        IsAuthenticatedOrReadOnly]  # making read only for time being, else esp will
+        IsAuthenticatedOrReadOnly]  # making read only for time being, else esp auth token ould need to be flashed again and again.
 
     def get(self, request: Request):
         unconfigured_labels = get_unconfigured_labels()
