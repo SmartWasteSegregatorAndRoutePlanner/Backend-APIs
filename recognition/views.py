@@ -6,14 +6,12 @@ from rest_framework.response import Response
 from .utils import detect_labels, classify_label, get_unconfigured_labels
 
 # api/recognition/recognize
-
-
 class ImageLabelRecognizer(APIView):
     '''
     Recognize the labels in image using amazon's Rekognition service
     '''
-    permission_classes = [
-        IsAuthenticatedOrReadOnly]  # making read only for time being, else esp auth token ould need to be flashed again and again.
+    #permission_classes = [
+    #    IsAuthenticatedOrReadOnly]  # making read only for time being, else esp auth token ould need to be flashed again and again.
 
     def get(self, request: Request):
         unconfigured_labels = get_unconfigured_labels()
