@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.request import Request
@@ -31,7 +32,10 @@ class ImageLabelRecognizer(APIView):
 
     def post(self, request: Request):
         msg = {'msg': 'image_file not provided'}
+        content_type = 'application/json'
         status_code = 400
+        response_func = Response
+
         img_file = request.FILES.get('image_file', False)
 
         # if img_file and not img_file.readable():
@@ -69,4 +73,14 @@ class ImageLabelRecognizer(APIView):
 
         msg = classify_label(labels)
 
-        return Response(msg, status=status_code, content_type='application/json')
+        if msg:
+            status_code = 200
+
+        resformat = request.query_params.get('format', 'text')
+
+        if resformat == 'text':
+            msg = msg.get('class')
+            content_type = 'plain/text'
+            response_func = HttpResponse
+
+        return response_func(msg, status=status_code, content_type=content_type)
